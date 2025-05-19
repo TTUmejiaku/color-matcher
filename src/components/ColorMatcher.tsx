@@ -19,6 +19,8 @@ interface MatchResult {
   similar: Array<{ color: DesignSystemColor; similarity: number }>;
 }
 
+const NO_OF_SIMILAR_COLORS = 2;
+
 const ColorMatcher = () => {
   const [inputColor, setInputColor] = useState("");
   const [formattedColor, setFormattedColor] = useState("");
@@ -54,7 +56,7 @@ const ColorMatcher = () => {
         distance: getColorDistance(standardHex, color.hex),
       }))
       .sort((a, b) => a.distance - b.distance)
-      .slice(0, 3) // Get top 3 closest colors
+      .slice(0, NO_OF_SIMILAR_COLORS) // Get top 3 closest colors
       .map((item) => ({
         color: item.color,
         similarity: getSimilarityPercentage(item.distance),
@@ -252,7 +254,8 @@ const ColorMatcher = () => {
                 No Exact Match Found
               </h3>
               <p className="text-amber-700 mb-4">
-                Here are the 3 closest colors from the design system:
+                Here are the {NO_OF_SIMILAR_COLORS} closest colors from the
+                design system:
               </p>
 
               <div className="space-y-4">
