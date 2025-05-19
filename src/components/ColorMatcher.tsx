@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   designSystemColors,
   DesignSystemColor,
@@ -27,6 +27,7 @@ const ColorMatcher = () => {
     similar: [],
   });
   const [isValidInput, setIsValidInput] = useState(false);
+  const lastProcessedClipboard = useRef<string | null>(null);
   const { toast } = useToast();
 
   // Function to find exact and similar colors
@@ -107,9 +108,15 @@ const ColorMatcher = () => {
         // Clean up the text and check if it's a valid hex code
         const cleanedText = text.trim();
 
-        if (isValidHexColor(cleanedText)) {
+        if (
+          isValidHexColor(cleanedText) &&
+          cleanedText !== lastProcessedClipboard.current
+        ) {
           setInputColor(cleanedText);
           findMatches(cleanedText);
+
+          // Update the last processed clipboard reference
+          lastProcessedClipboard.current = cleanedText;
 
           toast({
             title: "Color Detected",
@@ -130,9 +137,14 @@ const ColorMatcher = () => {
     // Also listen for paste events on the document
     const handlePaste = (e: ClipboardEvent) => {
       const pastedText = e.clipboardData?.getData("text");
-      if (pastedText && isValidHexColor(pastedText)) {
+      if (
+        pastedText &&
+        isValidHexColor(pastedText) &&
+        pastedText !== lastProcessedClipboard.current
+      ) {
         setInputColor(pastedText);
         findMatches(pastedText);
+        lastProcessedClipboard.current = pastedText;
       }
     };
 
